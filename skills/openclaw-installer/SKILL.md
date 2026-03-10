@@ -1,103 +1,103 @@
 ---
 name: openclaw-installer
-description: "OpenClaw 一键安装配置助手。当用户提到安装 OpenClaw、配置 OpenClaw、设置 OpenClaw、openclaw install、openclaw setup，或者想要搭建 AI 编程助手/AI 代码编辑器环境时触发此技能。自动完成环境检查、安装、配置和验证全流程。用户是技术小白，只需提供 API Key 即可。"
+description: "OpenClaw one-click installation and configuration assistant. Triggered when the user mentions installing OpenClaw, configuring OpenClaw, setting up OpenClaw, openclaw install, openclaw setup, or wants to set up an AI programming assistant / AI code editor environment. Automatically completes the full workflow of environment checks, installation, configuration, and verification. The user is a non-technical beginner who only needs to provide an API Key."
 ---
 
-# OpenClaw 安装助手
+# OpenClaw Installation Assistant
 
-自动完成 OpenClaw 的安装和配置，用户只需提供 API Key。
+Automatically complete the installation and configuration of OpenClaw. The user only needs to provide an API Key.
 
-## 流程
+## Workflow
 
-按以下步骤顺序执行，每步完成后再进行下一步。全程使用中文与用户交流。
+Execute the following steps in order. Proceed to the next step only after the current one is complete. Communicate with the user in English throughout.
 
-### 第 1 步：获取 API Key
+### Step 1: Obtain API Key
 
-- 检查环境变量 `GPTPROTO_API_KEY` 是否已存在
-- 若已有，直接使用；若没有，询问用户提供
-- API Key 格式示例：`sk-xxxxxxxx`
+- Check whether the environment variable `GPTPROTO_API_KEY` already exists
+- If it exists, use it directly; if not, ask the user to provide it
+- API Key format example: `sk-xxxxxxxx`
 
-### 第 2 步：环境检查
+### Step 2: Environment Check
 
-检查 Node.js 版本：
+Check the Node.js version:
 
 ```bash
 node --version
 ```
 
-- 要求 Node.js >= 22，若版本不足或未安装，自动安装/升级：
-  - macOS: `brew install node@22` 或使用 nvm
-  - Linux: 使用 nvm 或 NodeSource 安装
+- Requires Node.js >= 22. If the version is insufficient or not installed, automatically install/upgrade:
+  - macOS: `brew install node@22` or use nvm
+  - Linux: Use nvm or NodeSource to install
 
-检查 OpenClaw 是否已安装：
+Check whether OpenClaw is already installed:
 
 ```bash
 which openclaw 2>/dev/null || npm list -g openclaw 2>/dev/null
 ```
 
-- 若已安装，询问用户是否卸载重装
-- **卸载前必须先 `cd ~`**，否则会报错 `ENOENT: uv_cwd`：
+- If already installed, ask the user whether to uninstall and reinstall
+- **Must `cd ~` before uninstalling**, otherwise it will throw `ENOENT: uv_cwd` error:
 
 ```bash
 cd ~ && npm uninstall -g openclaw
 ```
 
-### 第 3 步：安装 OpenClaw
+### Step 3: Install OpenClaw
 
-根据平台选择安装方式：
+Choose the installation method based on the platform:
 
-**macOS/Linux（推荐）：**
+**macOS/Linux (Recommended):**
 ```bash
 curl -fsSL https://openclaw.ai/install.sh | bash
 ```
 
-**Windows：**
+**Windows:**
 ```powershell
 iwr -useb https://openclaw.ai/install.ps1 | iex
 ```
 
-**备选方案（npm，使用国内镜像）：**
+**Alternative (npm, using China mirror):**
 ```bash
 npm install -g openclaw@latest --registry=https://registry.npmmirror.com
 ```
 
-安装后验证：
+Verify after installation:
 ```bash
 openclaw --version
 ```
 
-### 第 4 步：配置
+### Step 4: Configuration
 
-跳过 OpenClaw 自带的配置向导，直接手动写入配置文件。
+Skip OpenClaw's built-in configuration wizard and write the config file manually.
 
-1. 读取 `references/config-template.json` 获取配置模板
-2. 将模板中所有 `<GPTPROTO_API_KEY>` 替换为用户实际的 API Key
-3. 确保目录存在并写入配置：
+1. Read `references/config-template.json` to get the configuration template
+2. Replace all `<GPTPROTO_API_KEY>` in the template with the user's actual API Key
+3. Ensure the directory exists and write the configuration:
 
 ```bash
 mkdir -p ~/.openclaw
 ```
 
-将替换后的 JSON 写入 `~/.openclaw/openclaw.json`。
+Write the processed JSON to `~/.openclaw/openclaw.json`.
 
-配置要点：
-- GPT Proto 兼容模式，Base URL: `https://gptproto.com/v1`
-- 包含两个 provider：`gptproto`（Anthropic 协议）和 `gptproto-openai`（OpenAI 协议）
-- 默认主模型：`gptproto-openai/gpt-5.4`
-- 可用模型：Claude Opus 4.6、GLM-5、GPT-4o、GPT-5.4
+Configuration details:
+- GPT Proto compatibility mode, Base URL: `https://gptproto.com/v1`
+- Includes two providers: `gptproto` (Anthropic protocol) and `gptproto-openai` (OpenAI protocol)
+- Default primary model: `gptproto-openai/gpt-5.4`
+- Available models: Claude Opus 4.6, GLM-5, GPT-4o, GPT-5.4
 
-### 第 5 步：安全加固
+### Step 5: Security Hardening
 
-修复配置文件和目录权限，避免安全审计告警：
+Fix configuration file and directory permissions to avoid security audit warnings:
 
 ```bash
 chmod 600 ~/.openclaw/openclaw.json
 chmod 700 ~/.openclaw
 ```
 
-### 第 6 步：启动网关
+### Step 6: Start the Gateway
 
-**必须先启动网关，Dashboard 才能访问。** 使用 `--force` 确保端口不被占用：
+**The gateway must be started first before the Dashboard can be accessed.** Use `--force` to ensure the port is not occupied:
 
 ```bash
 openclaw gateway run --force 2>&1 &
@@ -105,27 +105,27 @@ sleep 5
 openclaw health
 ```
 
-- 等待看到 `[gateway] listening on ws://127.0.0.1:18789` 表示启动成功
-- 网关启动后会自动生成 auth token 并写入配置文件
+- Wait until you see `[gateway] listening on ws://127.0.0.1:18789` to confirm a successful start
+- After the gateway starts, it will automatically generate an auth token and write it to the config file
 
-### 第 7 步：打开 Dashboard
+### Step 7: Open the Dashboard
 
 ```bash
 openclaw dashboard
 ```
 
-- 该命令会输出带 token 的完整 URL 并自动在浏览器中打开
-- URL 格式为：`http://127.0.0.1:18789/#token=<自动生成的TOKEN>`
+- This command outputs the full URL with the token and automatically opens it in the browser
+- URL format: `http://127.0.0.1:18789/#token=<AUTO_GENERATED_TOKEN>`
 
-## 完成输出
+## Completion Output
 
-安装完成后，向用户展示：
-- 安装结果（成功/失败）
-- 配置文件路径：`~/.openclaw/openclaw.json`
-- Dashboard 地址（`openclaw dashboard` 输出的完整带 token 的 URL）
-- 可用模型列表
+After installation is complete, present the following to the user:
+- Installation result (success/failure)
+- Config file path: `~/.openclaw/openclaw.json`
+- Dashboard URL (the full token-bearing URL output by `openclaw dashboard`)
+- List of available models
 
-## 参考
+## References
 
-- OpenClaw 官方文档：https://docs.openclaw.ai/start/getting-started
-- OpenClaw GitHub：https://github.com/openclaw/openclaw
+- OpenClaw official documentation: https://docs.openclaw.ai/start/getting-started
+- OpenClaw GitHub: https://github.com/openclaw/openclaw
